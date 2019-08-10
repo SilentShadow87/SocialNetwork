@@ -5,7 +5,7 @@ from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 
-from .serializers import UserCreateSerializer, PostListSerializer, PostCreateSerializer
+from .serializers import UserSerializer, PostListSerializer, PostCreateSerializer
 from .models import Post
 
 UserModel = get_user_model()
@@ -13,7 +13,11 @@ UserModel = get_user_model()
 # Create your views here.
 class UserCreateAPIView(CreateAPIView):
 	permission_classes = [AllowAny]
-	serializer_class = UserCreateSerializer
+	serializer_class = UserSerializer
+	queryset = UserModel.objects.all()
+
+class UserListAPIView(ListAPIView):
+	serializer_class = UserSerializer
 	queryset = UserModel.objects.all()
 
 class PostListAPIView(ListAPIView):

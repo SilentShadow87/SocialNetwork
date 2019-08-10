@@ -7,7 +7,7 @@ from .models import Post
 UserModel = get_user_model()
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = UserModel
 		fields = ['username', 'email', 'password']
