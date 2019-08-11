@@ -125,6 +125,9 @@ REST_FRAMEWORK = {
 	'DEFAULT_PERMISSION_CLASSES': [
 		'rest_framework.permissions.IsAuthenticated',
 	],
+	'DEFAULT_AUTHENTICATION_CLASSES': [
+		'rest_framework_simplejwt.authentication.JWTAuthentication',
+	]
 }
 
 EMAILHUNTER_KEY = '4a8c1556330524d4f04fa664fc29ff6a80e232c6'
