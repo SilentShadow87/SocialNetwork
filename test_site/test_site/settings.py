@@ -126,3 +126,5 @@ REST_FRAMEWORK = {
 		'rest_framework.permissions.IsAuthenticated',
 	],
 }
+
+EMAILHUNTER_KEY = '4a8c1556330524d4f04fa664fc29ff6a80e232c6'
