@@ -20,16 +20,19 @@ class ProfileCreateAPIView(CreateAPIView):
 
 
 class ProfileListAPIView(ListAPIView):
+	permission_classes = [AllowAny]
 	serializer_class = ProfileSerializer
 	queryset = ProfileModel.objects.all()
 
 
 class PostListAPIView(ListAPIView):
+	permission_classes = [AllowAny]
 	serializer_class = PostListSerializer
 	queryset = PostModel.objects.all()
 
 
 class PostDetailAPIView(RetrieveAPIView):
+	permission_classes = [AllowAny]
 	serializer_class = PostListSerializer
 	queryset = PostModel.objects.all()
 
@@ -49,11 +52,18 @@ class PostLikeAPIView(APIView):
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
 		if profile in post.likes.all():
+			print('User already liked this post.')
 			message = {'message': 'User already liked this post.'}
 			return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+		if post.author == profile:
+			print('User can not likes his own post.')
+			message = {'message': 'User can not likes his own post.'}
+			return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
 		post.likes.add(profile)
-		return Response(status=status.HTTP_200_OK)
+		data = {'success': True}
+		return Response(data, status=status.HTTP_200_OK)
 
 
 class PostUnlikeAPIView(APIView):

@@ -24,8 +24,10 @@ def validate_email(email):
 		response = requests.get(endpoint, params=params)
 		response.raise_for_status()
 
-	except requests.exceptions.HTTPError:
-		pass
+	except requests.exceptions.HTTPError as error:
+		if response.status_code == 429:
+			# set result to true for testing purpose
+			result = True
 
 	else:
 		data = response.json()['data']
@@ -60,13 +62,20 @@ class UserSerializer(serializers.ModelSerializer):
 		return user
 
 
+class PostListSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = PostModel
+		fields = '__all__'
+
+
 class ProfileSerializer(serializers.ModelSerializer):
 	user = UserSerializer()
+	blog_posts = PostListSerializer(many=True, read_only=True)
 
 	class Meta:
 		model = ProfileModel
-		fields = ['user', 'company']
-		read_only_fields = ['company',]
+		fields = ['id', 'user', 'blog_posts', 'liked_posts', 'company']
+		read_only_fields = ['id', 'company', 'liked_posts', 'blog_posts']
 
 	def create(self, validated_data):
 		user_data = validated_data.pop('user')
@@ -97,20 +106,14 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 		else:
 			data = response.json()
-			if 'person' in data:
+			if data['person'] is not None:
 				result['user_data']['first_name'] = data['person']['name']['givenName']
 				result['user_data']['last_name'] = data['person']['name']['familyName']
 
-			if 'company' in response:
-				result['other']['company_name'] = data['company']['name']
+			if data['company'] is not None:
+				result['other']['company'] = data['company']['name']
 
 		return result
-
-
-class PostListSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = PostModel
-		fields = '__all__'
 
 
 class PostCreateSerializer(serializers.ModelSerializer):

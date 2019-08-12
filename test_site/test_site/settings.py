@@ -120,18 +120,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = '/api/post/create'
 
 REST_FRAMEWORK = {
 	'DEFAULT_PERMISSION_CLASSES': [
 		'rest_framework.permissions.IsAuthenticated',
 	],
-	#'DEFAULT_AUTHENTICATION_CLASSES': [
-	#	'rest_framework_simplejwt.authentication.JWTAuthentication',
-	#]
+	'DEFAULT_AUTHENTICATION_CLASSES': [
+		'rest_framework_simplejwt.authentication.JWTAuthentication',
+	]
 }
 
 EMAILHUNTER = {
-	'API_KEY': '4a8c1556330524d4f04fa664fc29ff6a80e232c6',
+	'API_KEY': 'c2ad30c818ce8e4221694baa127e5468d8954082',
 	'ENDPOINT': 'https://api.hunter.io/v2/email-verifier'
 }
 
