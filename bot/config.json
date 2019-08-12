@@ -1,0 +1,16 @@
+{
+	"number_of_users": 5,
+	"max_posts_per_user": 5,
+	"max_likes_per_user": 5,
+
+	"server": {
+		"domain": "http://localhost:8000",
+		"api_paths": {
+			"user_create": "/api/user/create",
+			"user_list": "/api/user/list",
+			"user_login": "/api/user/login",
+			"post_create": "/api/post/create",
+			"post_like": "/api/post/like/{}"
+		}
+	}
+}
