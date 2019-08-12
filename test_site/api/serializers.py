@@ -4,15 +4,16 @@ from django.conf import settings
 import requests
 from rest_framework.validators import UniqueValidator
 
-from .models import Post
+from .models import ProfileModel, PostModel
+
 
 UserModel = get_user_model()
 
 def validate_email(email):
 	result = False
 	allowed_states = ['deliverable', 'risky']
-	api_key = settings.EMAILHUNTER_KEY
-	url = 'https://api.hunter.io/v2/email-verifier'
+	api_key = settings.EMAILHUNTER['API_KEY']
+	endpoint = settings.EMAILHUNTER['ENDPOINT']
 
 	params = {
 			'email': email,
@@ -20,7 +21,7 @@ def validate_email(email):
 		}
 
 	try:
-		response = requests.get(url, params=params)
+		response = requests.get(endpoint, params=params)
 		response.raise_for_status()
 
 	except requests.exceptions.HTTPError:
@@ -50,22 +51,70 @@ class UserSerializer(serializers.ModelSerializer):
 			}
 
 	def create(self, validated_data):
-		user = UserModel(
-		    email=validated_data['email'],
-			username=validated_data['username']
-		)
-		user.set_password(validated_data['password'])
+		password = validated_data.pop('password')
+		user = UserModel(**validated_data)
+
+		user.set_password(password)
 		user.save()
+
 		return user
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+	user = UserSerializer()
+
+	class Meta:
+		model = ProfileModel
+		fields = ['user', 'company']
+		read_only_fields = ['company',]
+
+	def create(self, validated_data):
+		user_data = validated_data.pop('user')
+		additional_data = self.get_additional_data(user_data['email'])
+		user_data.update(additional_data['user_data'])
+
+		user = UserSerializer().create(validated_data=user_data)
+		profile = ProfileModel.objects.create(user=user, **additional_data['other'])
+
+		return profile
+
+	def get_additional_data(self, email):
+		result = {
+				'user_data': {},
+				'other': {}
+			}
+
+		endpoint = settings.CLEARBIT['ENDPOINT']
+		params = {'email': email}
+		options = {'auth': (settings.CLEARBIT['API_KEY'], '')}
+
+		try:
+		    response = requests.get(endpoint, params=params, **options)
+		    response.raise_for_status()
+
+		except requests.exceptions.HTTPError:
+			pass
+
+		else:
+			data = response.json()
+			if 'person' in data:
+				result['user_data']['first_name'] = data['person']['name']['givenName']
+				result['user_data']['last_name'] = data['person']['name']['familyName']
+
+			if 'company' in response:
+				result['other']['company_name'] = data['company']['name']
+
+		return result
 
 
 class PostListSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = Post
+		model = PostModel
 		fields = '__all__'
+
 
 class PostCreateSerializer(serializers.ModelSerializer):
 	class Meta:
-		model = Post
+		model = PostModel
 		fields = ['title', 'body']
 

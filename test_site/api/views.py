@@ -8,59 +8,59 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
-from .serializers import UserSerializer, PostListSerializer, PostCreateSerializer
-from .models import Post
+from .serializers import UserSerializer, PostListSerializer, PostCreateSerializer, ProfileSerializer
+from .models import ProfileModel, PostModel
 
-UserModel = get_user_model()
 
 # Create your views here.
-class UserCreateAPIView(CreateAPIView):
+class ProfileCreateAPIView(CreateAPIView):
 	permission_classes = [AllowAny]
-	serializer_class = UserSerializer
-	queryset = UserModel.objects.all()
+	serializer_class = ProfileSerializer
+	queryset = ProfileModel.objects.all()
 
 
-class UserListAPIView(ListAPIView):
-	serializer_class = UserSerializer
-	queryset = UserModel.objects.all()
+class ProfileListAPIView(ListAPIView):
+	serializer_class = ProfileSerializer
+	queryset = ProfileModel.objects.all()
 
 
 class PostListAPIView(ListAPIView):
 	serializer_class = PostListSerializer
-	queryset = Post.objects.all()
+	queryset = PostModel.objects.all()
 
 
 class PostDetailAPIView(RetrieveAPIView):
 	serializer_class = PostListSerializer
-	queryset = Post.objects.all()
+	queryset = PostModel.objects.all()
 
 
 class PostCreateAPIView(CreateAPIView):
 	serializer_class = PostCreateSerializer
-	queryset = Post.objects.all()
+	queryset = PostModel.objects.all()
 
 	def perform_create(self, serializer):
-		serializer.save(author=self.request.user)
+		profile = get_object_or_404(ProfileModel, user=self.request.user)
+		serializer.save(author=profile)
 
 
 class PostLikeAPIView(APIView):
 	def get(self, request, pk):
-		post = get_object_or_404(Post, pk=pk)
-		user = self.request.user
+		post = get_object_or_404(PostModel, pk=pk)
+		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
-		if user in post.likes.all():
+		if profile in post.likes.all():
 			message = {'message': 'User already liked this post.'}
 			return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
-		post.likes.add(user)
+		post.likes.add(profile)
 		return Response(status=status.HTTP_200_OK)
 
 
 class PostUnlikeAPIView(APIView):
 	def get(self, request, pk):
-		post = get_object_or_404(Post, pk=pk)
-		user = self.request.user
+		post = get_object_or_404(PostModel, pk=pk)
+		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
-		post.likes.remove(user)
+		post.likes.remove(profile)
 		return Response(status=status.HTTP_200_OK)
 

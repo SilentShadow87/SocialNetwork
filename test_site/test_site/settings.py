@@ -125,9 +125,17 @@ REST_FRAMEWORK = {
 	'DEFAULT_PERMISSION_CLASSES': [
 		'rest_framework.permissions.IsAuthenticated',
 	],
-	'DEFAULT_AUTHENTICATION_CLASSES': [
-		'rest_framework_simplejwt.authentication.JWTAuthentication',
-	]
+	#'DEFAULT_AUTHENTICATION_CLASSES': [
+	#	'rest_framework_simplejwt.authentication.JWTAuthentication',
+	#]
 }
 
-EMAILHUNTER_KEY = '4a8c1556330524d4f04fa664fc29ff6a80e232c6'
+EMAILHUNTER = {
+	'API_KEY': '4a8c1556330524d4f04fa664fc29ff6a80e232c6',
+	'ENDPOINT': 'https://api.hunter.io/v2/email-verifier'
+}
+
+CLEARBIT = {
+	'API_KEY': 'sk_521669db9b6f538c85c3d09bf2e944c4',
+	'ENDPOINT': 'https://person-stream.clearbit.com/v2/combined/find'
+}

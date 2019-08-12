@@ -7,12 +7,17 @@ from django.dispatch import receiver
 
 
 # Create your models here.
-class Post(models.Model):
+class ProfileModel(models.Model):
+	user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+	company = models.CharField(max_length=30, blank=True)
+
+
+class PostModel(models.Model):
 	title = models.CharField(max_length=250)
 	slug = models.SlugField(max_length=250, unique_for_date='publish')
-	author = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='blog_posts', on_delete=models.CASCADE)
+	author = models.ForeignKey(ProfileModel, related_name='blog_posts', on_delete=models.CASCADE)
 	body = models.TextField()
-	likes = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='liked_posts', blank=True)
+	likes = models.ManyToManyField(ProfileModel, related_name='liked_posts', blank=True)
 	publish = models.DateTimeField(default=timezone.now)
 
 	def save(self, *args, **kwargs):
