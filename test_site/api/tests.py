@@ -167,10 +167,10 @@ class APITestCase(TestCase):
 		# test post list
 		post_id = self._test_post_list()
 
-		# user1 try to like their own post
+		# user1 try to like his own post
 		self._test_post_like(access_key1, post_id, status_code=status.HTTP_400_BAD_REQUEST)
 
-		# user1 try to unlike their own post
+		# user1 try to unlike his own post
 		self._test_post_unlike(access_key1, post_id, status_code=status.HTTP_400_BAD_REQUEST)
 
 		# reset client credentials

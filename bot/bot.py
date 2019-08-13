@@ -223,7 +223,7 @@ class Bot:
 					stop = True
 					break
 
-				# disable the user to like their own post
+				# disable the user to like his own post
 				for author in allowed_authors:
 					if author['id'] == next_user['id']:
 						allowed_authors.remove(author)
