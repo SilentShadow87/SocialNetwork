@@ -30,7 +30,7 @@ class Bot:
 
 	def create_random_email(self):
 		"""Create random email."""
-		return self.create_random_string(size=8) + '@testingpurpose.com'
+		return self.create_random_string(size=8) + '@example.com'
 
 	def create_random_password(self):
 		"""Create random password."""
