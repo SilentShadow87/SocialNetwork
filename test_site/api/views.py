@@ -77,6 +77,11 @@ class PostUnlikeAPIView(APIView):
 		post = get_object_or_404(PostModel, pk=pk)
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
+		# ban on unliking your own posts
+		if post.author == profile:
+			message = {'message': 'User can not likes his own post.'}
+			return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
 		# update data and return
 		post.likes.remove(profile)
 		data = {'success': True}
