@@ -118,6 +118,7 @@ class Bot:
 
 	def register_users(self, number_of_users):
 		"""Register users based on number specified in the configuration file."""
+		print('Register users....')
 		# get appropriate path from the config
 		path = self._config['server']['api_paths']['user_register']
 
@@ -143,8 +144,11 @@ class Bot:
 				# save credentials
 				self._credentials[username] = {'password': password}
 
+		print('Register users done.')
+
 	def create_posts(self):
 		"""Performcreation of the posts."""
+		print('Create posts...')
 		# get appropriate path from the config
 		path = self._config['server']['api_paths']['post_create']
 
@@ -175,6 +179,8 @@ class Bot:
 				# send request
 				self.send_request(path, method='post', params=json.dumps(data), headers=headers)
 
+		print('Create posts done.')
+
 	def like_post(self, user, post):
 		"""Perform post like."""
 		# get appropriate path from the config
@@ -197,6 +203,9 @@ class Bot:
 
 	def perform_posts_likes(self):
 		"""Method that performs post liking."""
+		print('Perform posts likes...')
+
+		stop = False
 		max_likes_per_user = self._config['max_likes_per_user']
 
 		# get list of all users and sort it based on the number of the created posts
@@ -211,7 +220,8 @@ class Bot:
 				# determine users which posts can be liked
 				allowed_authors = list(filter(self.has_unliked_posts, all_users))
 				if not allowed_authors:
-					return
+					stop = True
+					break
 
 				# disable the user to like their own post
 				for author in allowed_authors:
@@ -246,6 +256,12 @@ class Bot:
 				# determine data for the nest iteration
 				all_users = self.get_users()
 				likes_count = len([user for user in all_users if user['id'] == next_user['id']][0]['liked_posts'])
+
+			# check if bot should stop
+			if stop:
+				break
+
+		print('Perform posts likes done.')
 
 if __name__ == '__main__':
 	Bot()
