@@ -133,12 +133,12 @@ REST_FRAMEWORK = {
 
 # data for hunter.io API
 EMAILHUNTER = {
-	'API_KEY': 'c2ad30c818ce8e4221694baa127e5468d8954082',
+	'API_KEY': '', # set your emailhunter API key
 	'ENDPOINT': 'https://api.hunter.io/v2/email-verifier'
 }
 
 # data for crlearbit.com enrichment API
 CLEARBIT = {
-	'API_KEY': 'sk_521669db9b6f538c85c3d09bf2e944c4',
+	'API_KEY': '', # set your clearbit API key
 	'ENDPOINT': 'https://person-stream.clearbit.com/v2/combined/find'
 }
