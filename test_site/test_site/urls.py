@@ -19,6 +19,6 @@ from django.urls import path, include, re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-	path('api-auth/', include('rest_framework.urls')),
+	#path('api-auth/', include('rest_framework.urls')), # use for session based authentication
 	path('api/', include('api.urls', namespace='api')),
 ]

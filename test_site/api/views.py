@@ -42,25 +42,29 @@ class PostCreateAPIView(CreateAPIView):
 	queryset = PostModel.objects.all()
 
 	def perform_create(self, serializer):
+		"""Add current user to the serializer."""
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
 		serializer.save(author=profile)
 
 
 class PostLikeAPIView(APIView):
 	def get(self, request, pk):
+		"""Method that perform like on the given post."""
+		# get appropriate post and user
 		post = get_object_or_404(PostModel, pk=pk)
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
-		if profile in post.likes.all():
-			print('User already liked this post.')
-			message = {'message': 'User already liked this post.'}
-			return Response(message, status=status.HTTP_400_BAD_REQUEST)
-
+		# ban on liking your own posts
 		if post.author == profile:
-			print('User can not likes his own post.')
 			message = {'message': 'User can not likes his own post.'}
 			return Response(message, status=status.HTTP_400_BAD_REQUEST)
 
+		# check whether is post already liked by the current user
+		if profile in post.likes.all():
+			message = {'message': 'User already liked this post.'}
+			return Response(message, status=status.HTTP_400_BAD_REQUEST)
+
+		# update data and return
 		post.likes.add(profile)
 		data = {'success': True}
 		return Response(data, status=status.HTTP_200_OK)
@@ -68,9 +72,13 @@ class PostLikeAPIView(APIView):
 
 class PostUnlikeAPIView(APIView):
 	def get(self, request, pk):
+		"""Method that perform unlike on the given post."""
+		# get appropriate post and user
 		post = get_object_or_404(PostModel, pk=pk)
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
 
+		# update data and return
 		post.likes.remove(profile)
-		return Response(status=status.HTTP_200_OK)
+		data = {'success': True}
+		return Response(data, status=status.HTTP_200_OK)
 
