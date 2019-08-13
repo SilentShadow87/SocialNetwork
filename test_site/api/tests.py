@@ -1,9 +1,15 @@
-from django.test import TestCase
-from .models import PostModel, ProfileModel
 import random
 import string
 import lorem
+
+from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
+from django.urls import reverse
+
+from rest_framework.test import APIClient
+from rest_framework import status
+
+from .models import PostModel, ProfileModel
 
 
 UserModel = get_user_model()
@@ -60,5 +66,28 @@ class ModelTestCase(TestCase):
 		# check if instances are created
 		self.assertNotEqual(profile_old_count, profile_new_count)
 		self.assertNotEqual(post_old_count, post_new_count)
+
+
+@override_settings(DEBUG=True)
+class APITestCase(TestCase):
+	def setUp(self):
+		self.client = APIClient()
+
+	def test_user_register(self):
+		"""Test whether user can be register through API."""
+		username = create_random_string()
+		password = create_random_password()
+		email = create_random_email()
+
+		data = {
+			'user': {
+				'username': username,
+				'password': password,
+				'email': email
+			}
+		}
+
+		response = self.client.post(reverse('api:user_register'), data, format='json')
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
 
