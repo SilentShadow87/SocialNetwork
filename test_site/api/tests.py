@@ -92,6 +92,15 @@ class APITestCase(TestCase):
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 		return username, password
 
+	def _test_user_list(self):
+		response = self.client.get(reverse('api:user_list'))
+		user_list = response.json()
+		self.assertEqual(len(user_list), ProfileModel.objects.count())
+
+		for user in user_list:
+			user_id = user['id']
+			self.assertTrue(ProfileModel.objects.filter(pk=user_id).exists())
+
 	def _test_user_login(self, username, password):
 		data = {
 			'username': username,
@@ -113,7 +122,18 @@ class APITestCase(TestCase):
 		response = self.client.post(reverse('api:post_create'), data, format='json')
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+	def _test_post_list(self):
+		response = self.client.get(reverse('api:post_list'))
+		post_list = response.json()
+		self.assertEqual(len(post_list), PostModel.objects.count())
+
+		for post in post_list:
+			post_id = post['id']
+			self.assertTrue(PostModel.objects.filter(pk=post_id).exists())
+
 	def test_all(self):
 		username, password = self._test_user_register()
 		access_key = self._test_user_login(username, password)
+		self._test_user_list()
 		self._test_post_create(access_key)
+		self._test_post_list()
