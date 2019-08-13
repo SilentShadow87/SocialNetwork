@@ -6,7 +6,7 @@
 	"server": {
 		"domain": "http://localhost:8000",
 		"api_paths": {
-			"user_create": "/api/user/register",
+			"user_register": "/api/user/register",
 			"user_list": "/api/user/list",
 			"user_login": "/api/user/login",
 			"post_create": "/api/post/create",
