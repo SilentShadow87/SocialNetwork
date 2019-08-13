@@ -72,8 +72,9 @@ class ModelTestCase(TestCase):
 class APITestCase(TestCase):
 	def setUp(self):
 		self.client = APIClient()
+		self.users = {}
 
-	def test_user_register(self):
+	def _test_user_register(self):
 		"""Test whether user can be register through API."""
 		username = create_random_string()
 		password = create_random_password()
@@ -89,5 +90,30 @@ class APITestCase(TestCase):
 
 		response = self.client.post(reverse('api:user_register'), data, format='json')
 		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+		return username, password
 
+	def _test_user_login(self, username, password):
+		data = {
+			'username': username,
+			'password': password
+		}
 
+		response = self.client.post(reverse('api:user_login'), data, format='json')
+		self.assertEqual(response.status_code, status.HTTP_200_OK)
+		return response.json()['access']
+
+	def _test_post_create(self, access_key):
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_key)
+
+		data = {
+			'title': create_random_title(),
+			'body': create_random_text()
+		}
+
+		response = self.client.post(reverse('api:post_create'), data, format='json')
+		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+	def test_all(self):
+		username, password = self._test_user_register()
+		access_key = self._test_user_login(username, password)
+		self._test_post_create(access_key)
