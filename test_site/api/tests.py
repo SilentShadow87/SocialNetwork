@@ -74,12 +74,8 @@ class APITestCase(TestCase):
 		self.client = APIClient()
 		self.users = {}
 
-	def _test_user_register(self):
+	def _test_user_register(self, username, password, email, status_code=status.HTTP_201_CREATED):
 		"""Test whether user can be register through API."""
-		username = create_random_string()
-		password = create_random_password()
-		email = create_random_email()
-
 		data = {
 			'user': {
 				'username': username,
@@ -89,8 +85,7 @@ class APITestCase(TestCase):
 		}
 
 		response = self.client.post(reverse('api:user_register'), data, format='json')
-		self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-		return username, password
+		self.assertEqual(response.status_code, status_code)
 
 	def _test_user_list(self):
 		response = self.client.get(reverse('api:user_list'))
@@ -131,9 +126,62 @@ class APITestCase(TestCase):
 			post_id = post['id']
 			self.assertTrue(PostModel.objects.filter(pk=post_id).exists())
 
+		return post_id
+
+	def _test_post_like(self, access_key, post_id, status_code=status.HTTP_200_OK):
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_key)
+		response = self.client.get(reverse('api:post_like', args=[post_id,]))
+		self.assertEqual(response.status_code, status_code)
+
+	def _test_post_unlike(self, access_key, post_id, status_code=status.HTTP_200_OK):
+		self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + access_key)
+		response = self.client.get(reverse('api:post_unlike', args=[post_id,]))
+		self.assertEqual(response.status_code, status_code)
+
 	def test_all(self):
-		username, password = self._test_user_register()
-		access_key = self._test_user_login(username, password)
+		# generate data for users
+		username1 = create_random_string()
+		password1 = create_random_password()
+		email1 = create_random_email()
+		username2 = create_random_string()
+		password2 = create_random_password()
+		email2 = create_random_email()
+
+		# register and login user1
+		self._test_user_register(username1, password1, email1)
+		access_key1 = self._test_user_login(username1, password1)
+
+		# try to register user1 again
+		self._test_user_register(username1, password1, email1, status_code=status.HTTP_400_BAD_REQUEST)
+
+		# register and login user2
+		self._test_user_register(username2, password2, email2)
+		access_key2 = self._test_user_login(username2, password2)
+
+		# test user list
 		self._test_user_list()
-		self._test_post_create(access_key)
-		self._test_post_list()
+
+		# test post create
+		self._test_post_create(access_key1)
+
+		# test post list
+		post_id = self._test_post_list()
+
+		# user1 try to like their own post
+		self._test_post_like(access_key1, post_id, status_code=status.HTTP_400_BAD_REQUEST)
+
+		# user1 try to unlike their own post
+		self._test_post_unlike(access_key1, post_id, status_code=status.HTTP_400_BAD_REQUEST)
+
+		# reset client credentials
+		self.client.credentials()
+
+		# test user2 like user1 post
+		self._test_post_like(access_key2, post_id)
+
+		# test user2 tries to like same post again
+		self._test_post_like(access_key2, post_id, status_code=status.HTTP_400_BAD_REQUEST)
+
+		# test user2 unlike user1 post
+		self._test_post_unlike(access_key2, post_id)
+
