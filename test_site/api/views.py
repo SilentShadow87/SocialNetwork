@@ -49,7 +49,7 @@ class PostCreateAPIView(CreateAPIView):
 
 class PostLikeAPIView(APIView):
 	def get(self, request, pk):
-		"""Method that perform like on the given post."""
+		"""Method that performs like on the given post."""
 		# get appropriate post and user
 		post = get_object_or_404(PostModel, pk=pk)
 		profile = get_object_or_404(ProfileModel, user=self.request.user)
@@ -72,7 +72,7 @@ class PostLikeAPIView(APIView):
 
 class PostUnlikeAPIView(APIView):
 	def get(self, request, pk):
-		"""Method that perform unlike on the given post."""
+		"""Method that performs unlike on the given post."""
 		# get appropriate post and user
 		post = get_object_or_404(PostModel, pk=pk)
 		profile = get_object_or_404(ProfileModel, user=self.request.user)

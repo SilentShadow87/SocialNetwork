@@ -29,12 +29,17 @@ def validate_email(email):
 		response.raise_for_status()
 
 	except requests.exceptions.HTTPError as error:
+		# check if number of requests limit is reached
 		if response.status_code == 429:
-			# set result to true for testing purpose
-			raise serializers.ValidationError("Servis is currently unable to check your data. Please try lather.")
+			if settings.DEBUG:
+				# set result to true for testing purpose
+				result = True
+
+			else:
+				raise serializers.ValidationError("The service is currently unable to check your data. Please try lather.")
 
 	else:
-		# check email state
+		# extract email state from response
 		data = response.json()['data']
 		if data['result'] in allowed_states:
 			result = True
