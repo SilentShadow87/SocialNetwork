@@ -84,8 +84,8 @@ class UserSerializer(serializers.ModelSerializer):
 		model = UserModel
 		fields = ['username', 'email', 'password']
 		extra_kwargs = {
-				'password': {'write_only': True}
-			}
+			'password': {'write_only': True}
+		}
 
 	def create(self, validated_data):
 		"""Hash user password before saving user."""
@@ -128,9 +128,9 @@ class ProfileSerializer(serializers.ModelSerializer):
 	def get_additional_data(self, email):
 		"""Get additional data of the user using clearbit.com API."""
 		result = {
-				'user_data': {},
-				'other': {}
-			}
+			'user_data': {},
+			'other': {}
+		}
 
 		# prepare request
 		endpoint = settings.CLEARBIT['ENDPOINT']
