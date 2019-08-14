@@ -139,8 +139,8 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 		# send request to clearbit.com API.
 		try:
-		    response = requests.get(endpoint, params=params, **options)
-		    response.raise_for_status()
+			response = requests.get(endpoint, params=params, **options)
+			response.raise_for_status()
 
 		except requests.exceptions.HTTPError:
 			pass
