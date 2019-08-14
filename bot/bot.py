@@ -110,15 +110,22 @@ class Bot:
 
 	def get_users(self):
 		"""Send reuest for the list of all users to the API."""
+		result = []
+
 		# get appropriate path from the config
 		path = self._config['server']['api_paths']['user_list']
 
 		# send request and return response data
-		return self.send_request(path)
+		response = self.send_request(path)
+		if response:
+			# filter user of the current bot execution
+			result = list(filter(lambda user: user['user']['username'] in self._credentials, response))
+
+		return result
 
 	def register_users(self, number_of_users):
 		"""Register users based on number specified in the configuration file."""
-		print('Register users....')
+		print('Register users...')
 		# get appropriate path from the config
 		path = self._config['server']['api_paths']['user_register']
 
