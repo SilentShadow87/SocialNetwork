@@ -198,7 +198,7 @@ class Bot:
 		self.send_request(path, headers=headers)
 
 	def has_unliked_posts(self, user):
-		"""method that determines if there are user posts that have not yet been liked."""
+		"""Method that determines if there are user posts that have not yet been liked."""
 		return not all(post['likes'] for post in user['blog_posts'])
 
 	def perform_posts_likes(self):
@@ -234,18 +234,11 @@ class Bot:
 					break
 
 				# chouse random author
-				author = None
-				while not author:
-					random_author = random.choice(allowed_authors)
-					blog_posts = random_author['blog_posts']
+				random_author = random.choice(allowed_authors)
+				blog_posts = random_author['blog_posts']
 
-					# check whether next user can likes some of the random author posts
-					blog_posts = list(filter(lambda post: next_user['id'] not in post['likes'], blog_posts))
-					if not blog_posts:
-						allowed_authors.remove(random_author)
-						continue
-
-					author = random_author
+				# filter posts that next user can likes
+				blog_posts = list(filter(lambda post: next_user['id'] not in post['likes'], blog_posts))
 
 				# chouse random post
 				random_post = random.choice(blog_posts)
