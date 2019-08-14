@@ -73,10 +73,13 @@ class UserSerializer(serializers.ModelSerializer):
 	    Class used for both, serializing and deserializing users data.
 	"""
 	# add custom validators for cheking email address
-	email = serializers.EmailField(validators=[
-									UniqueValidator(queryset=UserModel.objects.all()),
-									validate_email
-								])
+	email = serializers.EmailField(
+		    validators=[
+				UniqueValidator(queryset=UserModel.objects.all()),
+				validate_email
+			]
+		)
+
 	class Meta:
 		model = UserModel
 		fields = ['username', 'email', 'password']
