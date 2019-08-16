@@ -217,7 +217,7 @@ class Bot:
 
 		# get list of all users and sort it based on the number of the created posts
 		all_users = self.get_users()
-		sort_user_list = sorted(all_users, key=lambda user: len(user['blog_posts']))
+		sort_user_list = sorted(all_users, key=lambda user: len(user['blog_posts']), reverse=True)
 
 		# determine next user
 		for next_user in sort_user_list:
